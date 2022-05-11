@@ -1,41 +1,24 @@
 import React from 'react'
-import {FaShoppingCart} from 'react-icons/fa'
+import {AiOutlineShoppingCart} from 'react-icons/ai'
 import {AiFillCloseCircle} from 'react-icons/ai'
 import Link from 'next/link'
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import { useEffect,useState,useRef } from 'react'
 import Router from 'next/router'
-import Image from 'next/image'
 const jwt = require('jsonwebtoken')
-
-export default function Navbar() {
-  let [arr,setarr] = useState('')
-  const [cdat,setc] = useState([])
-  const cartdata = []
-  useEffect(()=>{
-    try{
-      
-      const existingitems = localStorage.getItem('cart')
-      const splited = existingitems.split(',')
-      splited.map((item)=>{
-        
-        cartdata.push(item)
-      })
-      setc(cartdata)
-    }
-    catch{
-      const existingitems = localStorage.getItem('cart')
-      cartdata.push(existingitems)
-      
-    }
-    setc(cartdata)
-  },[arr])
+let refresh = []
+export default function Navbar({update,cdat,subtotal}) {
+  
   const [name,set] = useState(null)
   const cartref = useRef()
+  useEffect(()=>{toggle()},[])
   const toggle = () => {
     if(cartref.current.classList.contains('translate-x-full')){
       cartref.current.classList.remove('translate-x-full')
+      cartref.current.classList.remove('hidden')
+      update(Math.random().toString())
       
-      setarr(Math.random().toString())
     }
     
     
@@ -43,7 +26,8 @@ export default function Navbar() {
   }
   const cross = () => {
     cartref.current.classList.add('translate-x-full')
-    setarr(Math.random().toString())
+    cartref.current.classList.add('hidden')
+    update(Math.random().toString())
   }
   const handleclick = () =>{
     if(name === null){
@@ -68,19 +52,19 @@ export default function Navbar() {
     }
   },[])
   return (
-    <header id='' className="text-black bg-white shadow-xl body-font">
+    <header id='' className="text-black animate-[load_2s_ease-in-out] bg-white shadow-xl body-font">
     <div className="container mx-auto flex flex-wrap p-5 flex-col md:flex-row items-center">
         <Link href={'/'}>
       <a className="flex title-font font-small items-center text-white mb-4 md:mb-0">
-        <Image src={'/logo1.png'} width="200" height="70"></Image>
+        <img src={'/logo.png'} className='-mt-4' width="200" height="70"></img>
       </a>
         </Link>
       <nav className="md:ml-8 flex flex-wrap items-center text-base justify-center">
-        <Link href = {'/Tshirts'}><a className="mr-5 hover:fill-indigo-600 font-bold cursor-pointer">Tshirt</a></Link>
-        <Link href = {'/Hoodies'}><a className="mr-5 hover:fill-indigo-600 font-bold cursor-pointer">Hoodies</a></Link>
-        <Link href = {'/Mugs'}><a className="mr-5 hover:fill-indigo-600 font-bold cursor-pointer">Mugs</a></Link>
-        <Link href = {'/Shoes'}><a className="mr-5 hover:fill-indigo-600 font-bold cursor-pointer">Shoes</a></Link>
-        <Link href = {'/about'}><a className="mr-5 hover:fill-indigo-600 font-bold cursor-pointer">About us</a></Link>
+        <Link href = {'/Tshirts'}><a className="mr-5 hover:text-slate-600 font-bold cursor-pointer">Tshirt</a></Link>
+        <Link href = {'/Hoodies'}><a className="mr-5 hover:text-slate-600 font-bold cursor-pointer">Hoodies</a></Link>
+        <Link href = {'/Mugs'}><a className="mr-5 hover:text-slate-600 font-bold cursor-pointer">Mugs</a></Link>
+        <Link href = {'/Shoes'}><a className="mr-5 hover:text-slate-600 font-bold cursor-pointer">Shoes</a></Link>
+        <Link href = {'/about'}><a className="mr-5 hover:text-slate-600 font-bold cursor-pointer">About us</a></Link>
 
         {/* <a className="mr-5 ml-auto hover:fill-indigo-600 font-bold cursor-pointer">{name ? 'Welcome' + ' ' + '@' + name : null}</a> */}
       </nav>
@@ -89,7 +73,7 @@ export default function Navbar() {
           <path d="M5 12h14M12 5l7 7-7 7"></path>
         </svg>
       </button>
-      <FaShoppingCart onClick={toggle} className='text-3xl cursor-pointer' />
+      <AiOutlineShoppingCart onClick={toggle} className='text-3xl cursor-pointer -mt-8 md:mt-0' />
       <div ref={cartref} className="cart transition-transform translate-x-full transform bg-indigo-300 absolute top-0 right-0 p-10">
         <h2 className='font-bold text-xl'>Shopping Cart</h2>
         <span className='absolute top-2 right-2'><AiFillCloseCircle onClick={cross} className='cursor-pointer' size={20}/></span>
@@ -100,9 +84,21 @@ export default function Navbar() {
               <span>{item}</span>
           </li>
             ))}
+            <h1 className='font-bold'>Subtotal:{subtotal}</h1>
+            <Link href={'/checkout'}>
+            <button className='bg-indigo-600 rounded-sm text-white w-28 h-8'>Checkout</button>
+            </Link>
+            <button className='bg-indigo-600 rounded-sm text-white w-28 h-8 ml-2' onClick={()=>{
+                localStorage.removeItem('cart')
+                update(Math.random().toString())
+              localStorage.removeItem('price')
+            }}>Clear cart</button>
         </ol>
       </div>
     </div>
   </header>
   )
+}
+export function refreshcart(){
+  refresh.push(Math.random().toString())
 }
